@@ -12,7 +12,7 @@ $ git clone https://github.com/ElevatEd-Devs/ElevatEd_backend
 
 <p>Make sure to set up the .env file: for more info send a message to the backend channel on discord</p>
 
-<p>For live reloading make sure your have air installed</p>
+<p>For live reloading make sure your have <a href="https://github.com/air-verse/air">air</a> installed</p>
 
 ```
 $ go install github.com/cosmtrek/air@latest
@@ -30,7 +30,7 @@ $ air
 go run main.go
 ```
 
-<h2>Using Docker</h2>
+<h2>Using Docker <img width="48" height="48" src="https://img.icons8.com/color/48/docker.png" alt="docker"/></h2>
 <p>Coming soon...</p>
 
 <h2>Contributing ✍️</h2>
