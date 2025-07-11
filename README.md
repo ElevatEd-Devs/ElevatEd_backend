@@ -27,7 +27,16 @@ $ air
 <p>You could  also just run the server normally with:</p>
 
 ```
-go run main.go
+$ go run main.go
+```
+
+<h4>For Ubuntu users</h4>
+<p> You may face some challenges with running air on different terminals, here is a work around: </p>
+
+```
+$ export PATH=$PATH:$HOME/go/bin
+$ source ~/.bashrc
+$ air
 ```
 
 <h2>Using Docker <img width="48" height="48" src="https://img.icons8.com/color/48/docker.png" alt="docker"/></h2>
@@ -43,5 +52,5 @@ go run main.go
 
 <h2>Testing EndPoints🧪</h2>
 <p>You could test APIs with: <a href="https://www.postman.com/">Postman</a> or <a href="https://www.usebruno.com/">Bruno</a> </p>
-<p>There is also a .http file you would find in this repository, just hit the send request button</p>
+<p>There is also a <a href="https://learn.microsoft.com/en-us/aspnet/core/test/http-files?view=aspnetcore-9.0">.http</a> file you would find in this repository, just hit the send request button</p>
 <img width="100" height="22" alt="image" src="https://github.com/user-attachments/assets/c9a77824-75f4-438a-9366-96309653422a" />
