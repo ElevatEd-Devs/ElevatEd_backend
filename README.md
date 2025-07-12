@@ -15,7 +15,7 @@ $ git clone https://github.com/ElevatEd-Devs/ElevatEd_backend
 <p>For live reloading make sure your have <a href="https://github.com/air-verse/air">air</a> installed</p>
 
 ```
-$ go install github.com/cosmtrek/air@latest
+$ go install github.com/air-verse/air@latest
 ```
 <p>Now that your have air installed run the following in the project directory:</p>
 
