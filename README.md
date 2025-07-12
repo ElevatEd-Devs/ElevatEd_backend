@@ -17,12 +17,14 @@ $ git clone https://github.com/ElevatEd-Devs/ElevatEd_backend
 ```
 $ go install github.com/cosmtrek/air@latest
 ```
+
 <p>Now that your have air installed run the following in the project directory:</p>
 
 ```
 $ air
 ```
-<p>This would start the server and listen for changes in the program</p>  
+
+<p>This would start the server and listen for changes in the program</p>
 
 <p>You could  also just run the server normally with:</p>
 
@@ -30,7 +32,7 @@ $ air
 go run main.go
 ```
 
-<h2>Using Docker</h2>
+<h2>Using Docker <img src="https://img.icons8.com/color/36/docker.png" alt="docker"/></h2>
 <p>Coming soon...</p>
 
 <h2>Contributing ✍️</h2>
@@ -45,3 +47,10 @@ go run main.go
 <p>You could test APIs with: <a href="https://www.postman.com/">Postman</a> or <a href="https://www.usebruno.com/">Bruno</a> </p>
 <p>There is also a .http file you would find in this repository, just hit the send request button</p>
 <img width="100" height="22" alt="image" src="https://github.com/user-attachments/assets/c9a77824-75f4-438a-9366-96309653422a" />
+
+<h2>More Documentation</h2>
+<p>This repository also has more detailed documentation about various features:</p>
+
+<ul>
+    <li> Learn the ropes for [Auth](/docs/authEndPoints.md)</li>
+</ul>
