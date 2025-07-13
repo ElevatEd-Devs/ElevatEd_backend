@@ -12,10 +12,10 @@ $ git clone https://github.com/ElevatEd-Devs/ElevatEd_backend
 
 <p>Make sure to set up the .env file: for more info send a message to the backend channel on discord</p>
 
-<p>For live reloading make sure your have air installed</p>
+<p>For live reloading make sure your have <a href="https://github.com/air-verse/air">air</a> installed</p>
 
 ```
-$ go install github.com/cosmtrek/air@latest
+$ go install github.com/air-verse/air@latest
 ```
 
 <p>Now that your have air installed run the following in the project directory:</p>
@@ -29,10 +29,19 @@ $ air
 <p>You could  also just run the server normally with:</p>
 
 ```
-go run main.go
+$ go run main.go
 ```
 
-<h2>Using Docker <img src="https://img.icons8.com/color/36/docker.png" alt="docker"/></h2>
+<h4>For Ubuntu users</h4>
+<p> You may face some challenges with running air on different terminals, here is a work around: </p>
+
+```
+$ export PATH=$PATH:$HOME/go/bin
+$ source ~/.bashrc
+$ air
+```
+
+<h2>Using Docker <img width="48" height="48" src="https://img.icons8.com/color/48/docker.png" alt="docker"/></h2>
 <p>Coming soon...</p>
 
 <h2>Contributing ✍️</h2>
@@ -45,7 +54,7 @@ go run main.go
 
 <h2>Testing EndPoints🧪</h2>
 <p>You could test APIs with: <a href="https://www.postman.com/">Postman</a> or <a href="https://www.usebruno.com/">Bruno</a> </p>
-<p>There is also a .http file you would find in this repository, just hit the send request button</p>
+<p>There is also a <a href="https://learn.microsoft.com/en-us/aspnet/core/test/http-files?view=aspnetcore-9.0">.http</a> file you would find in this repository, just hit the send request button</p>
 <img width="100" height="22" alt="image" src="https://github.com/user-attachments/assets/c9a77824-75f4-438a-9366-96309653422a" />
 
 <h2>More Documentation</h2>
