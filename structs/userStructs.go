@@ -1,8 +1,9 @@
-package router
+package structs
 
 import (
 	// "github.com/google/uuid"
 	"math/rand"
+	"time"
 )
 
 type SignInDetails struct {
@@ -31,6 +32,16 @@ type UserDetails struct {
 	Email_notifications bool   `json:"email_notifications"`
 	Language            string `json:"language"`
 	Is_verified         bool   `json:"is_verified"`
+}
+
+type UserSessionStruct struct {
+	Id           int       `json:"id"`
+	UserId       int       `json:"user_id"`
+	RefreshToken string    `json:"token"`
+	Ip           string    `json:"ip"`
+	UserAgent    string    `json:"user_agent"`
+	ExpiresAt    time.Time `json:"expires_at"`
+	CreatedAt    time.Time `json:"created_at"`
 }
 
 func ConvertSignInDetailsToUserDetails(signInDetails SignInDetails, userDetails *UserDetails) {
