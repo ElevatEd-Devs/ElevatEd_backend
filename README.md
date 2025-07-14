@@ -40,7 +40,14 @@ $ air
 ```
 
 <h2>Using Docker <img width="48" height="48" src="https://img.icons8.com/color/48/docker.png" alt="docker"/></h2>
-<p>Coming soon...</p>
+<p>A quick demonstration into how <a href="https://www.docker.com/get-started/">docker</a> might be used.</p>
+<p>This would build a docker image for the project called "elevated_backend", then run the image.</p>
+<p>Note: in this example the host's 3000 port is mapped to the container's 3000 port.</p>
+
+```
+ docker build -t elevated_backend .
+ docker run -p 3000:3000 --rm -v $(pwd):/app -v /app/tmp --name docker-air elevated_backend
+```
 
 <h2>Contributing ✍️</h2>
 <p>For each issue that you pick up, create a new branch and work on it.</p>  
