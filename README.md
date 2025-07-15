@@ -45,8 +45,8 @@ $ air
 <p>Note: in this example the host's 3000 port is mapped to the container's 3000 port.</p>
 
 ```
- docker build -t elevated_backend .
- docker run -p 3000:3000 --rm -v $(pwd):/app -v /app/tmp --name docker-air elevated_backend
+$ docker build -t elevated_backend .
+$ docker run -p 3000:3000 --rm -v $(pwd):/app -v /app/tmp --name docker-air elevated_backend
 ```
 
 <h2>Contributing ✍️</h2>
