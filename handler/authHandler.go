@@ -37,7 +37,7 @@ func SignupHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 	_, commandError := conn.Exec(c.Context(), createUserString)
 
 	if commandError != nil {
-		fmt.Println(commandError)
+		// fmt.Println(commandError)
 		c.Status(500)
 		return c.JSON(authFunc.BuildErrorMResponse("could not create user"))
 	}
@@ -107,13 +107,13 @@ func LoginHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 	jwtToken, jwtGenErr := authFunc.GenerateJWT(c, userDetails)
 	if jwtGenErr != nil {
 		c.Status(500)
-		return c.JSON(authFunc.BuildErrorMResponse("could not create session"))
+		return c.JSON(authFunc.BuildErrorMResponse("JWT could not be generated"))
 	}
 
 	refreshToken := authFunc.GenerateRefreshToken()
 
 	sessionErr := authFunc.CreateSession(c, conn, userDetails.Id, base64.StdEncoding.EncodeToString(authFunc.GenerateHash(refreshToken)), "")
-	fmt.Println(sessionErr)
+	// fmt.Println(sessionErr)
 	if sessionErr != nil {
 		c.Status(500)
 		return c.JSON(authFunc.BuildErrorMResponse("could not create session"))
@@ -140,8 +140,8 @@ func JWTHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 	refreshHash := base64.StdEncoding.EncodeToString(authFunc.GenerateHash(refreshToken.Token))
 	validSession, userSession, sessionErr := authFunc.IsSessionValid(c, conn, refreshHash)
 
-	if !validSession {
-		c.Status(500)
+	if !validSession && sessionErr == nil {
+		c.Status(401)
 		return c.JSON(authFunc.BuildErrorMResponse("session expired"))
 	}
 
