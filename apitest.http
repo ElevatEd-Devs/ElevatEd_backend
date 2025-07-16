@@ -1,1 +1,17 @@
-GET http://localhost:3000/pingServer
+# GET http://localhost:3000/pingServer
+
+# POST http://localhost:3000/student
+# Content-Type: application/json
+
+# {
+#     "email": "testert02@mail.test",
+#     "password": "testing001"
+# }
+
+GET http://localhost:3000/student
+Content-Type: application/json
+
+{
+    "email": "testert02@mail.test",
+    "password": "testing001"
+}
