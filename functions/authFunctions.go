@@ -101,7 +101,7 @@ func (*AuthFunc) GenerateJWT(c *fiber.Ctx, userDetails structs.UserDetails) (str
 func (*AuthFunc) ExtractJWTFromHeader(c *fiber.Ctx) string {
 	rawBearer := c.Get("Authorization")
 	tokenString := ""
-	bearerPattern := regexp.MustCompile(`Bearer: ^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$`)
+	bearerPattern := regexp.MustCompile(`Bearer ^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$`)
 	if bearerPattern.MatchString(rawBearer) {
 		tokenString = rawBearer[7:]
 	}
