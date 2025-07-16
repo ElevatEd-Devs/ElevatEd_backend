@@ -1,4 +1,4 @@
-l<h1> ElevatEd Backend </h1>
+<h1> ElevatEd Backend </h1>
 
 <h2> Getting started 🧑‍💻</h2>
 <p>Make sure you have go installed: <a href="https://go.dev/doc/install">Install Go</a></p>
