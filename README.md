@@ -1,4 +1,4 @@
-<h1> ElevatEd Backend </h1>
+l<h1> ElevatEd Backend </h1>
 
 <h2> Getting started 🧑‍💻</h2>
 <p>Make sure you have go installed: <a href="https://go.dev/doc/install">Install Go</a></p>
@@ -67,6 +67,4 @@ $ docker run -p 3000:3000 --rm -v $(pwd):/app -v /app/tmp --name docker-air elev
 <h2>More Documentation</h2>
 <p>This repository also has more detailed documentation about various features:</p>
 
-<ul>
-    <li> Learn the ropes for [Auth](/docs/authEndPoints.md)</li>
-</ul>
+- [Auth Docs](docs/authEndPoints.md)
