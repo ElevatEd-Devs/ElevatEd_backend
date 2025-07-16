@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -100,7 +101,8 @@ func (*AuthFunc) GenerateJWT(c *fiber.Ctx, userDetails structs.UserDetails) (str
 func (*AuthFunc) ExtractJWTFromHeader(c *fiber.Ctx) string {
 	rawBearer := c.Get("Authorization")
 	tokenString := ""
-	if len(rawBearer) > 7 {
+	bearerPattern := regexp.MustCompile(`Bearer: ^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$`)
+	if bearerPattern.MatchString(rawBearer) {
 		tokenString = rawBearer[7:]
 	}
 	return tokenString
