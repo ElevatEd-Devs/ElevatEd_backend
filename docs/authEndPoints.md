@@ -6,7 +6,7 @@
 <p>This endpoint exists for the sole reason of creating accounts for users.</p>
 <p>It creates a session by exchanging a JWT and refresh token with the client</p>
 <p>It would also attempt to log the user in.</p>
-<p>Make a POST request to http://localhost:3000/users</p>
+<p>Make a POST request to http://localhost:3000/v1/users</p>
 <p>Ensure that the Content-Type is "application/json"</p>
 <p>The expected body format:</p>
 
@@ -44,7 +44,7 @@
 <h3>Login EndPoint 🔓</h3>
 <p>This endpoint exists for the sole reason of logging users in.</p>
 <p>It creates a session by exchanging a JWT and refresh token with the client</p>
-<p>Make a POST request to http://localhost:3000/login</p>
+<p>Make a POST request to http://localhost:3000/v1/login</p>
 <p>Ensure that the Content-Type is "application/json"</p>
 <p>The expected body format:</p>
 
@@ -83,7 +83,7 @@
 <p>Proper implementation client-side should involve setting a timer based on the expiration date of the JWT</p>
 <p>Once the JWT expires send a request to the server for re-generation</p>
 <p>If the refresh token has expired the request will fail to generate a new JWT</p>
-<p>Make a POST request to http://localhost:3000/jwtToken</p>
+<p>Make a POST request to http://localhost:3000/v1/jwtToken</p>
 <p>Ensure that the Content-Type is "application/json"</p>
 <p>The expected body format:</p>
 
