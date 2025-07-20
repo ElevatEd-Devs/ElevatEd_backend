@@ -9,7 +9,6 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-// functions here need to verify users, implement auth flow once endpoints are confirmed to work
 func GetAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 	var appointmentFunc functions.AppointmentFunc
 	var appointmentsRequester structs.AppointmentsRequester
@@ -23,12 +22,12 @@ func GetAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 	appointments, getErr := appointmentFunc.GetAppointment(c, conn, appointmentString)
 
 	if getErr != nil {
-		return c.JSON(appointmentFunc.BuildAppointmentError("could not fetch appointments"))
+		return c.JSON(appointmentFunc.BuildAppointmentError(getErr.Error()))
 	}
 
 	return c.JSON(fiber.Map{
 		"status":       "successful",
-		"message":      "appointments were found",
+		"message":      "appointments were gotten",
 		"appointments": appointments,
 	})
 }
@@ -45,14 +44,13 @@ func CreateAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 	creationErr := appointmentFunc.CreateAppointment(c, conn, &appointment)
 
 	if creationErr != nil {
-		return c.JSON(appointmentFunc.BuildAppointmentError("could not create appointment"))
+		return c.JSON(appointmentFunc.BuildAppointmentError(creationErr.Error()))
 	}
 
 	return c.JSON(fiber.Map{
 		"status":  "successful",
 		"message": "appointment was saved",
 	})
-
 }
 
 func UpdateAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
@@ -67,14 +65,13 @@ func UpdateAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 	patchErr := appointmentFunc.PatchAppointment(c, conn, &appointmentPatcher)
 
 	if patchErr != nil {
-		return c.JSON(appointmentFunc.BuildAppointmentError("could not update appointment"))
+		return c.JSON(appointmentFunc.BuildAppointmentError(patchErr.Error()))
 	}
 
 	return c.JSON(fiber.Map{
 		"status":  "successful",
 		"message": "appointment was updated",
 	})
-
 }
 
 func DeleteAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
@@ -101,7 +98,7 @@ func DeleteAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 func initialChecker(c *fiber.Ctx, appointmentStruct any, appointmentFunc *functions.AppointmentFunc) (fiber.Map, error) {
 	err := c.BodyParser(&appointmentStruct)
 	if err != nil {
-		return appointmentFunc.BuildAppointmentError("malformed request"), err
+		return appointmentFunc.BuildAppointmentError(err.Error()), err
 	}
 
 	var authFunc functions.AuthFunc
@@ -109,7 +106,7 @@ func initialChecker(c *fiber.Ctx, appointmentStruct any, appointmentFunc *functi
 	verified, verificationErr := authFunc.VerifyJWT(jwt)
 
 	if verificationErr != nil {
-		return appointmentFunc.BuildAppointmentError("invalid signing method for JWT"), verificationErr
+		return appointmentFunc.BuildAppointmentError(verificationErr.Error()), verificationErr
 	}
 
 	if !verified {
