@@ -12,7 +12,7 @@ import (
 type AppointmentFunc struct{}
 
 func (*AppointmentFunc) BuildGetAppointmentString(personType string, requestId int) string {
-	appointmentString := fmt.Sprintf("SELECT * FROM appointments WHERE %v_id = %v and cancellation_reason IS NOT NULL", personType, requestId)
+	appointmentString := fmt.Sprintf("SELECT * FROM appointments WHERE %v_id=%v and cancellation_reason IS NOT NULL", personType, requestId)
 	return appointmentString
 }
 
@@ -48,9 +48,9 @@ func BuildCreateAppointmentString() string {
 	return creationString
 }
 
-func BuildAppointmentCheckerString() string {
-	checkerString := `SELECT id FROM Appointments WHERE id = $1 or NOT ((start_time <= $2 and end_time <= $3) or ($2 <= start_time and end_time <= $3)
-					  or ($2 <= start_time and $3 <= end_time) or (start_time <= $2 and $3 <= end_time)) and cancelled_at = NULL`
+func BuildAppointmentCheckerString(userId int, userRole string) string {
+	checkerString := fmt.Sprintf(`SELECT id FROM Appointments WHERE id = $1 or %v_id=%v or ((start_time <= $2 and end_time <= $3) or ($2 <= start_time and end_time <= $3)
+					  or ($2 <= start_time and $3 <= end_time) or (start_time <= $2 and $3 <= end_time)) and cancelled_at = NULL`, userRole, userId)
 	return checkerString
 }
 
@@ -82,8 +82,8 @@ func checkAppointmentExistence(c *fiber.Ctx, conn *pgx.Conn, checkerString strin
 	return false, nil
 }
 
-func (*AppointmentFunc) CreateAppointment(c *fiber.Ctx, conn *pgx.Conn, appointment *structs.Appointment) error {
-	createAppointmentCheckerString := BuildAppointmentCheckerString()
+func (*AppointmentFunc) CreateAppointment(c *fiber.Ctx, conn *pgx.Conn, appointment *structs.Appointment, userClaims *CustomClaimStruct) error {
+	createAppointmentCheckerString := BuildAppointmentCheckerString(userClaims.Details.Id, userClaims.Details.Role)
 	valid, err := isValidAppointment(c, conn, createAppointmentCheckerString, appointment)
 
 	if err != nil {
@@ -95,6 +95,7 @@ func (*AppointmentFunc) CreateAppointment(c *fiber.Ctx, conn *pgx.Conn, appointm
 	}
 
 	createAppointmentString := BuildCreateAppointmentString()
+	appointment.Status = "scheduled"
 	_, creationErr := conn.Exec(c.Context(), createAppointmentString,
 		fmt.Sprintf("%d", appointment.Id), appointment.CourseId, appointment.OfficeHoursId, appointment.TeacherId, appointment.StudentId, appointment.Title,
 		appointment.Description, appointment.StartTime, appointment.EndTime, appointment.Location, appointment.MeetingUrl, appointment.Status,
@@ -102,17 +103,17 @@ func (*AppointmentFunc) CreateAppointment(c *fiber.Ctx, conn *pgx.Conn, appointm
 	return creationErr
 }
 
-func BuildAppointmentUpdateString(patchField string) string {
-	return fmt.Sprintf(`UPDATE appointments SET %v=$1 WHERE id=$2`, patchField)
+func BuildAppointmentUpdateString(patchField string, userId int, userRole string) string {
+	return fmt.Sprintf(`UPDATE appointments SET %v=$1 WHERE id=$2 and %v_id=%v`, patchField, userRole, userId)
 }
 
-func BuildAppointmentExistenceCheckerString(appointmentId int) string {
-	existenceString := fmt.Sprintf(`SELECT id FROM appointments WHERE id=%v`, appointmentId)
+func BuildAppointmentExistenceCheckerString(appointmentId int, userId int, userRole string) string {
+	existenceString := fmt.Sprintf(`SELECT id FROM appointments WHERE id=%v and %v_id=%v`, appointmentId, userRole, userId)
 	return existenceString
 }
 
-func (*AppointmentFunc) PatchAppointment(c *fiber.Ctx, conn *pgx.Conn, appointmentPatcher *structs.AppointmentPatcher) error {
-	appointmentCheckerString := BuildAppointmentExistenceCheckerString(appointmentPatcher.AppointmentId)
+func (*AppointmentFunc) PatchAppointment(c *fiber.Ctx, conn *pgx.Conn, appointmentPatcher *structs.AppointmentPatcher, userClaims *CustomClaimStruct) error {
+	appointmentCheckerString := BuildAppointmentExistenceCheckerString(appointmentPatcher.AppointmentId, userClaims.Details.Id, userClaims.Details.Role)
 	exists, err := checkAppointmentExistence(c, conn, appointmentCheckerString, appointmentPatcher)
 
 	if !exists {
@@ -123,19 +124,19 @@ func (*AppointmentFunc) PatchAppointment(c *fiber.Ctx, conn *pgx.Conn, appointme
 		return err
 	}
 
-	updateString := BuildAppointmentUpdateString(appointmentPatcher.PatchField)
+	updateString := BuildAppointmentUpdateString(appointmentPatcher.PatchField, userClaims.Details.Id, userClaims.Details.Role)
 	_, patchErr := conn.Exec(c.Context(), updateString, appointmentPatcher.NewContent, appointmentPatcher.AppointmentId)
 	fmt.Println(patchErr)
 	return patchErr
 }
 
-func BuildAppointmentDeletionString(appointmentId int) string {
-	deletionString := fmt.Sprintf(`DELETE FROM appointments WHERE id=%v`, appointmentId)
+func BuildAppointmentDeletionString(appointmentId int, userId int, userRole string) string {
+	deletionString := fmt.Sprintf(`DELETE FROM appointments WHERE id=%v and %v_id=%v`, appointmentId, userRole, userId)
 	return deletionString
 }
 
-func (*AppointmentFunc) DeleteAppointment(c *fiber.Ctx, conn *pgx.Conn, appointmentDeleter *structs.AppointmentDeleter) error {
-	deletionString := BuildAppointmentDeletionString(appointmentDeleter.AppointmentId)
+func (*AppointmentFunc) DeleteAppointment(c *fiber.Ctx, conn *pgx.Conn, appointmentDeleter *structs.AppointmentDeleter, userClaims *CustomClaimStruct) error {
+	deletionString := BuildAppointmentDeletionString(appointmentDeleter.AppointmentId, userClaims.Details.Id, userClaims.Details.Role)
 	_, deletionErr := conn.Exec(c.Context(), deletionString)
 	return deletionErr
 }

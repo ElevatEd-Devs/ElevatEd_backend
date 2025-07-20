@@ -16,7 +16,7 @@ import (
 
 type AuthFunc struct{}
 
-type customClaimStruct struct {
+type CustomClaimStruct struct {
 	Details              structs.UserDetails `json:"details"`
 	jwt.RegisteredClaims `json:"registered_claims"`
 }
@@ -83,7 +83,7 @@ func (*AuthFunc) GenerateHash(password string) []byte {
 }
 
 func (*AuthFunc) GenerateJWT(c *fiber.Ctx, userDetails structs.UserDetails) (string, error) {
-	var claimStruct customClaimStruct
+	var claimStruct CustomClaimStruct
 	claimStruct.Details = userDetails
 	claimStruct.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Hour / 6))
 
@@ -108,8 +108,8 @@ func (*AuthFunc) ExtractJWTFromHeader(c *fiber.Ctx) string {
 	return tokenString
 }
 
-func (*AuthFunc) VerifyJWT(tokenString string) (bool, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &customClaimStruct{}, func(token *jwt.Token) (interface{}, error) {
+func (*AuthFunc) VerifyJWT(tokenString string) (bool, CustomClaimStruct, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &CustomClaimStruct{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
@@ -117,16 +117,16 @@ func (*AuthFunc) VerifyJWT(tokenString string) (bool, error) {
 	})
 
 	if err != nil {
-		return false, err
+		return false, CustomClaimStruct{}, err
 	}
 
-	if claims, ok := token.Claims.(*customClaimStruct); ok && token.Valid {
+	if claims, ok := token.Claims.(*CustomClaimStruct); ok && token.Valid {
 		if claims.ExpiresAt.Time.Before(time.Now()) {
-			return false, nil
+			return false, CustomClaimStruct{}, nil
 		}
-		return true, nil
+		return true, *claims, nil
 	} else {
-		return false, nil
+		return false, CustomClaimStruct{}, nil
 	}
 }
 

@@ -11,14 +11,13 @@ import (
 
 func GetAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 	var appointmentFunc functions.AppointmentFunc
-	var appointmentsRequester structs.AppointmentsRequester
-	errorMap, initialErr := initialChecker(c, &appointmentsRequester, &appointmentFunc)
+	errorMap, userClaims, initialErr := initialCheckerG(c, &appointmentFunc)
 
 	if initialErr != nil {
 		return c.JSON(errorMap)
 	}
 
-	appointmentString := appointmentFunc.BuildGetAppointmentString(appointmentsRequester.RequesterType, appointmentsRequester.RequesterId)
+	appointmentString := appointmentFunc.BuildGetAppointmentString(userClaims.Details.Role, userClaims.Details.Id)
 	appointments, getErr := appointmentFunc.GetAppointment(c, conn, appointmentString)
 
 	if getErr != nil {
@@ -35,13 +34,13 @@ func GetAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 func CreateAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 	var appointmentFunc functions.AppointmentFunc
 	var appointment structs.Appointment
-	errorMap, initialErr := initialChecker(c, &appointment, &appointmentFunc)
+	errorMap, userClaims, initialErr := initialCheckerPPD(c, &appointment, &appointmentFunc)
 
 	if initialErr != nil {
 		return c.JSON(errorMap)
 	}
 
-	creationErr := appointmentFunc.CreateAppointment(c, conn, &appointment)
+	creationErr := appointmentFunc.CreateAppointment(c, conn, &appointment, &userClaims)
 
 	if creationErr != nil {
 		return c.JSON(appointmentFunc.BuildAppointmentError(creationErr.Error()))
@@ -56,13 +55,13 @@ func CreateAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 func UpdateAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 	var appointmentFunc functions.AppointmentFunc
 	var appointmentPatcher structs.AppointmentPatcher
-	errorMap, initialErr := initialChecker(c, &appointmentPatcher, &appointmentFunc)
+	errorMap, userClaims, initialErr := initialCheckerPPD(c, &appointmentPatcher, &appointmentFunc)
 
 	if initialErr != nil {
 		return c.JSON(errorMap)
 	}
 
-	patchErr := appointmentFunc.PatchAppointment(c, conn, &appointmentPatcher)
+	patchErr := appointmentFunc.PatchAppointment(c, conn, &appointmentPatcher, &userClaims)
 
 	if patchErr != nil {
 		return c.JSON(appointmentFunc.BuildAppointmentError(patchErr.Error()))
@@ -77,13 +76,13 @@ func UpdateAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 func DeleteAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 	var appointmentFunc functions.AppointmentFunc
 	var appointmentDeleter structs.AppointmentDeleter
-	errorMap, initialErr := initialChecker(c, &appointmentDeleter, &appointmentFunc)
+	errorMap, userClaims, initialErr := initialCheckerPPD(c, &appointmentDeleter, &appointmentFunc)
 
 	if initialErr != nil {
 		return c.JSON(errorMap)
 	}
 
-	deletionErr := appointmentFunc.DeleteAppointment(c, conn, &appointmentDeleter)
+	deletionErr := appointmentFunc.DeleteAppointment(c, conn, &appointmentDeleter, &userClaims)
 
 	if deletionErr != nil {
 		return c.JSON(appointmentFunc.BuildAppointmentError("could not delete appointment"))
@@ -95,24 +94,41 @@ func DeleteAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 	})
 }
 
-func initialChecker(c *fiber.Ctx, appointmentStruct any, appointmentFunc *functions.AppointmentFunc) (fiber.Map, error) {
-	err := c.BodyParser(&appointmentStruct)
-	if err != nil {
-		return appointmentFunc.BuildAppointmentError(err.Error()), err
-	}
-
+func initialCheckerG(c *fiber.Ctx, appointmentFunc *functions.AppointmentFunc) (fiber.Map, functions.CustomClaimStruct, error) {
 	var authFunc functions.AuthFunc
 	jwt := authFunc.ExtractJWTFromHeader(c)
-	verified, verificationErr := authFunc.VerifyJWT(jwt)
+	verified, userClaims, verificationErr := authFunc.VerifyJWT(jwt)
 
 	if verificationErr != nil {
-		return appointmentFunc.BuildAppointmentError(verificationErr.Error()), verificationErr
+		return appointmentFunc.BuildAppointmentError(verificationErr.Error()), userClaims, verificationErr
 	}
 
 	if !verified {
 		const errorString = "identity could not be verified"
-		return appointmentFunc.BuildAppointmentError(errorString), errors.New(errorString)
+		return appointmentFunc.BuildAppointmentError(errorString), userClaims, errors.New(errorString)
 	}
 
-	return nil, nil
+	return nil, userClaims, nil
+}
+
+func initialCheckerPPD(c *fiber.Ctx, appointmentStruct any, appointmentFunc *functions.AppointmentFunc) (fiber.Map, functions.CustomClaimStruct, error) {
+	err := c.BodyParser(&appointmentStruct)
+	if err != nil {
+		return appointmentFunc.BuildAppointmentError(err.Error()), functions.CustomClaimStruct{}, err
+	}
+
+	var authFunc functions.AuthFunc
+	jwt := authFunc.ExtractJWTFromHeader(c)
+	verified, userClaims, verificationErr := authFunc.VerifyJWT(jwt)
+
+	if verificationErr != nil {
+		return appointmentFunc.BuildAppointmentError(verificationErr.Error()), userClaims, verificationErr
+	}
+
+	if !verified {
+		const errorString = "identity could not be verified"
+		return appointmentFunc.BuildAppointmentError(errorString), userClaims, errors.New(errorString)
+	}
+
+	return nil, userClaims, nil
 }
