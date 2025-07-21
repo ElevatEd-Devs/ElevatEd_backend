@@ -124,9 +124,8 @@ func (*AppointmentFunc) DeleteAppointment(c *fiber.Ctx, conn *pgx.Conn, appointm
 
 func (*AppointmentFunc) BuildAppointmentError(reason string) fiber.Map {
 	return fiber.Map{
-		"status":       "failed",
-		"message":      reason,
-		"appointments": nil,
+		"status":  "failed",
+		"message": reason,
 	}
 }
 
