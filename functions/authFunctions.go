@@ -85,7 +85,7 @@ func (*AuthFunc) GenerateHash(password string) []byte {
 func (*AuthFunc) GenerateJWT(c *fiber.Ctx, userDetails structs.UserDetails) (string, error) {
 	var claimStruct CustomClaimStruct
 	claimStruct.Details = userDetails
-	claimStruct.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Hour / 6))
+	claimStruct.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Hour * 3))
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claimStruct)
 
@@ -190,7 +190,7 @@ func (*AuthFunc) EndSession(c *fiber.Ctx, conn *pgx.Conn, userSession *structs.U
 
 	writeString := fmt.Sprintf(`UPDATE USER_SESSIONS SET expires_at='%v' WHERE session_token='%v';`,
 		userSession.ExpiresAt.Format("2006-01-02 15:04:05.000000"), refreshHash)
-	fmt.Println(userSession.ExpiresAt.Format("2006-01-02 15:04:05.000000"), refreshHash)
+
 	_, err := conn.Exec(c.Context(), writeString)
 
 	if err != nil {

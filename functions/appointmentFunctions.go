@@ -4,6 +4,7 @@ import (
 	"elevated_backend/structs"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5"
@@ -11,13 +12,18 @@ import (
 
 type AppointmentFunc struct{}
 
-func (*AppointmentFunc) BuildGetAppointmentString(personType string, requestId int) string {
-	appointmentString := fmt.Sprintf("SELECT * FROM appointments WHERE %v_id=%v and cancellation_reason IS NOT NULL", personType, requestId)
-	return appointmentString
-}
+func (*AppointmentFunc) GetAppointment(c *fiber.Ctx, conn *pgx.Conn, userClaimsDetails *structs.UserDetails) ([]structs.Appointment, error) {
+	var queryString string
+	switch userClaimsDetails.Role {
+	case "student":
+		queryString = `SELECT * FROM appointments WHERE student_id= $1 and cancellation_reason IS NOT NULL`
+	case "teacher":
+		queryString = `SELECT * FROM appointments WHERE teacher_id= $1 and cancellation_reason IS NOT NULL`
+	default:
+		return nil, errors.New("invalid permissions")
+	}
 
-func (*AppointmentFunc) GetAppointment(c *fiber.Ctx, conn *pgx.Conn, queryString string) ([]structs.Appointment, error) {
-	rows, err := conn.Query(c.Context(), queryString)
+	rows, err := conn.Query(c.Context(), queryString, userClaimsDetails.Id)
 
 	if err != nil {
 		return nil, err
@@ -40,38 +46,13 @@ func (*AppointmentFunc) GetAppointment(c *fiber.Ctx, conn *pgx.Conn, queryString
 	return appointments, nil
 }
 
-func BuildCreateAppointmentString() string {
-	creationString := `INSERT INTO APPOINTMENTS
-					  (id, course_id, office_hours_id, teacher_id, student_id, title, description, start_time, end_time,
-					  location, meeting_url, status, cancellation_reason, reminder_sent, notes, created_at, cancelled_at)
-					  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`
-	return creationString
-}
+func doesAppointmentExist(c *fiber.Ctx, conn *pgx.Conn, appointmentPatcher *structs.AppointmentPatcher) (bool, error) {
+	queryString := `SELECT EXISTS
+					(SELECT 1 FROM appointments WHERE id = $1 AND cancelled_at IS NOT NULL)`
+	var appointmentExists bool
+	err := conn.QueryRow(c.Context(), queryString, appointmentPatcher.AppointmentId).Scan(&appointmentExists)
 
-func BuildAppointmentCheckerString(userId int, userRole string) string {
-	checkerString := fmt.Sprintf(`SELECT id FROM Appointments WHERE id = $1 or %v_id=%v or ((start_time <= $2 and end_time <= $3) or ($2 <= start_time and end_time <= $3)
-					  or ($2 <= start_time and $3 <= end_time) or (start_time <= $2 and $3 <= end_time)) and cancelled_at = NULL`, userRole, userId)
-	return checkerString
-}
-
-func isValidAppointment(c *fiber.Ctx, conn *pgx.Conn, checkerString string, appointment *structs.Appointment) (bool, error) {
-	var appointmentId = -1
-	err := conn.QueryRow(c.Context(), checkerString, appointment.Id, appointment.StartTime, appointment.EndTime).Scan(&appointmentId)
-	if appointmentId == -1 {
-		return true, nil
-	}
-
-	if err != nil {
-		return false, err
-	}
-
-	return false, nil
-}
-
-func checkAppointmentExistence(c *fiber.Ctx, conn *pgx.Conn, checkerString string, appointmentPatcher *structs.AppointmentPatcher) (bool, error) {
-	var appointmentId = -1
-	err := conn.QueryRow(c.Context(), checkerString, appointmentPatcher.AppointmentId).Scan(&appointmentId)
-	if appointmentId == -1 {
+	if appointmentExists {
 		return true, nil
 	}
 
@@ -83,18 +64,21 @@ func checkAppointmentExistence(c *fiber.Ctx, conn *pgx.Conn, checkerString strin
 }
 
 func (*AppointmentFunc) CreateAppointment(c *fiber.Ctx, conn *pgx.Conn, appointment *structs.Appointment, userClaims *CustomClaimStruct) error {
-	createAppointmentCheckerString := BuildAppointmentCheckerString(userClaims.Details.Id, userClaims.Details.Role)
-	valid, err := isValidAppointment(c, conn, createAppointmentCheckerString, appointment)
+	valid, err := isValidAppointment(c, conn, appointment)
 
 	if err != nil {
 		return err
 	}
 
 	if !valid {
-		return errors.New("appointment is not unique")
+		return err
 	}
 
-	createAppointmentString := BuildCreateAppointmentString()
+	createAppointmentString := `INSERT INTO APPOINTMENTS
+					(id, course_id, office_hours_id, teacher_id, student_id, title, description, start_time, end_time,
+					location, meeting_url, status, cancellation_reason, reminder_sent, notes, created_at, cancelled_at)
+					VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`
+
 	appointment.Status = "scheduled"
 	_, creationErr := conn.Exec(c.Context(), createAppointmentString,
 		fmt.Sprintf("%d", appointment.Id), appointment.CourseId, appointment.OfficeHoursId, appointment.TeacherId, appointment.StudentId, appointment.Title,
@@ -107,14 +91,8 @@ func BuildAppointmentUpdateString(patchField string, userId int, userRole string
 	return fmt.Sprintf(`UPDATE appointments SET %v=$1 WHERE id=$2 and %v_id=%v`, patchField, userRole, userId)
 }
 
-func BuildAppointmentExistenceCheckerString(appointmentId int, userId int, userRole string) string {
-	existenceString := fmt.Sprintf(`SELECT id FROM appointments WHERE id=%v and %v_id=%v`, appointmentId, userRole, userId)
-	return existenceString
-}
-
 func (*AppointmentFunc) PatchAppointment(c *fiber.Ctx, conn *pgx.Conn, appointmentPatcher *structs.AppointmentPatcher, userClaims *CustomClaimStruct) error {
-	appointmentCheckerString := BuildAppointmentExistenceCheckerString(appointmentPatcher.AppointmentId, userClaims.Details.Id, userClaims.Details.Role)
-	exists, err := checkAppointmentExistence(c, conn, appointmentCheckerString, appointmentPatcher)
+	exists, err := doesAppointmentExist(c, conn, appointmentPatcher)
 
 	if !exists {
 		return errors.New("no appointment to edit")
@@ -126,18 +104,21 @@ func (*AppointmentFunc) PatchAppointment(c *fiber.Ctx, conn *pgx.Conn, appointme
 
 	updateString := BuildAppointmentUpdateString(appointmentPatcher.PatchField, userClaims.Details.Id, userClaims.Details.Role)
 	_, patchErr := conn.Exec(c.Context(), updateString, appointmentPatcher.NewContent, appointmentPatcher.AppointmentId)
-	fmt.Println(patchErr)
 	return patchErr
 }
 
-func BuildAppointmentDeletionString(appointmentId int, userId int, userRole string) string {
-	deletionString := fmt.Sprintf(`DELETE FROM appointments WHERE id=%v and %v_id=%v`, appointmentId, userRole, userId)
-	return deletionString
-}
-
 func (*AppointmentFunc) DeleteAppointment(c *fiber.Ctx, conn *pgx.Conn, appointmentDeleter *structs.AppointmentDeleter, userClaims *CustomClaimStruct) error {
-	deletionString := BuildAppointmentDeletionString(appointmentDeleter.AppointmentId, userClaims.Details.Id, userClaims.Details.Role)
-	_, deletionErr := conn.Exec(c.Context(), deletionString)
+	var deletionString string
+	switch userClaims.Details.Role {
+	case "student":
+		deletionString = `DELETE FROM appointments WHERE id=$1 and student_id=$2`
+	case "teacher":
+		deletionString = `DELETE FROM appointments WHERE id=$1 and teacher_id=$2`
+	default:
+		return errors.New("invalid permissions")
+	}
+
+	_, deletionErr := conn.Exec(c.Context(), deletionString, appointmentDeleter.AppointmentId, userClaims.Details.Id)
 	return deletionErr
 }
 
@@ -145,6 +126,81 @@ func (*AppointmentFunc) BuildAppointmentError(reason string) fiber.Map {
 	return fiber.Map{
 		"status":       "failed",
 		"message":      reason,
-		"appointments": "",
+		"appointments": nil,
 	}
+}
+
+func hasDuplications(c *fiber.Ctx, conn *pgx.Conn, appointment *structs.Appointment) (bool, error) {
+	studentQueryString := `SELECT EXISTS 
+					(SELECT 1 FROM appointments WHERE (id=$1) OR (student_id = $2 AND NOT (end_time < $3 OR start_time > $4)))`
+	teacherQueryString := `SELECT EXISTS 
+					(SELECT 1 FROM appointments WHERE (id=$1) OR (student_id = $2 AND NOT (end_time < $3 OR start_time > $4)))`
+
+	var studentConflictExists bool
+	studentScanErr := conn.QueryRow(
+		c.Context(), studentQueryString, appointment.Id, appointment.StudentId, appointment.StartTime.UTC(), appointment.EndTime.UTC(),
+	).Scan(&studentConflictExists)
+
+	var teacherConflictExists bool
+	teacherScanErr := conn.QueryRow(
+		c.Context(), teacherQueryString, appointment.Id, appointment.StudentId, appointment.StartTime.UTC(), appointment.EndTime.UTC(),
+	).Scan(&teacherConflictExists)
+
+	if studentConflictExists || teacherConflictExists {
+		return true, errors.New("new appointment fails uniqueness test")
+	}
+
+	if studentScanErr != nil && teacherScanErr != nil {
+		return false, errors.New(studentScanErr.Error() + " and " + teacherScanErr.Error())
+	}
+
+	if studentScanErr != nil {
+		return false, studentScanErr
+	}
+
+	if teacherScanErr != nil {
+		return false, teacherScanErr
+	}
+
+	return false, nil
+}
+
+func hasOfficeHoursConflict(c *fiber.Ctx, conn *pgx.Conn, appointment *structs.Appointment) (bool, error) {
+	queryString := `SELECT day_of_week, start_time, end_time FROM office_hours WHERE (teacher_id = $1) AND (current_students < max_students)`
+	var dayOfWeek int
+	var startTime time.Time
+	var endTime time.Time
+
+	scanErr := conn.QueryRow(c.Context(), queryString, appointment.TeacherId).Scan(&dayOfWeek, &startTime, &endTime)
+
+	if scanErr != nil {
+		if errors.Is(scanErr, pgx.ErrNoRows) {
+			return false, nil
+		}
+		return false, scanErr
+	}
+
+	if int(appointment.StartTime.Weekday()) != dayOfWeek {
+		return false, errors.New("day does not match office hour day")
+	}
+
+	if !(appointment.EndTime.UTC().Before(startTime) || endTime.Before(appointment.StartTime)) {
+		return true, nil
+	}
+	return false, errors.New("times do not match office hour time")
+}
+
+func isValidAppointment(c *fiber.Ctx, conn *pgx.Conn, appointment *structs.Appointment) (bool, error) {
+	duplicateExists, dupErr := hasDuplications(c, conn, appointment)
+
+	if duplicateExists || dupErr != nil {
+		return false, dupErr
+	}
+
+	conflictExists, conflictErr := hasOfficeHoursConflict(c, conn, appointment)
+	if conflictExists || conflictErr != nil {
+		return false, conflictErr
+	}
+
+	return true, nil
 }

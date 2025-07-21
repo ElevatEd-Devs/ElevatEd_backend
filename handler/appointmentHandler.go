@@ -17,8 +17,7 @@ func GetAppointmentHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 		return c.JSON(errorMap)
 	}
 
-	appointmentString := appointmentFunc.BuildGetAppointmentString(userClaims.Details.Role, userClaims.Details.Id)
-	appointments, getErr := appointmentFunc.GetAppointment(c, conn, appointmentString)
+	appointments, getErr := appointmentFunc.GetAppointment(c, conn, &userClaims.Details)
 
 	if getErr != nil {
 		return c.JSON(appointmentFunc.BuildAppointmentError(getErr.Error()))
