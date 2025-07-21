@@ -1,6 +1,6 @@
 <h1>Docs for Appointment EndPoints ⏰</h1>
 
-<p>Note: requests to this endpoint require <a href="https://github.com/golang-jwt/jwt">JWT</a> token because it is a protected resource</p>
+<p>Note: requests to this endpoint require a <a href="https://github.com/golang-jwt/jwt">JWT</a> token because it is a protected resource</p>
 
 <h3>GET EndPoint ⬇️</h3>
 <p>This endpoint exists to allow clients requests all the appointments associated with them.</p>
