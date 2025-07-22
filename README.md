@@ -68,3 +68,4 @@ docker run -p 3000:3000 --rm -v $(pwd):/app -v /app/tmp --name docker-air elevat
 <p>This repository also has more detailed documentation about various features:</p>
 
 - [Auth Docs](docs/authEndPoints.md)
+- [Event Docs](docs/eventEndPoints.md)
