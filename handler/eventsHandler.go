@@ -72,42 +72,42 @@ func PostEventsHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 	})
 }
 
-func PatchEventHandler(c *fiber.Ctx, conn *pgx.Conn) error {
-	var eventFunc functions.EventFunc
-	var authFunc functions.AuthFunc
-	jwt := authFunc.ExtractJWTFromHeader(c)
-	valid, userClaims, err := authFunc.VerifyJWT(jwt)
+// func PatchEventHandler(c *fiber.Ctx, conn *pgx.Conn) error {
+// 	var eventFunc functions.EventFunc
+// 	var authFunc functions.AuthFunc
+// 	jwt := authFunc.ExtractJWTFromHeader(c)
+// 	valid, userClaims, err := authFunc.VerifyJWT(jwt)
 
-	if err != nil {
-		return c.JSON(eventFunc.BuildErrorString(err.Error()))
-	}
+// 	if err != nil {
+// 		return c.JSON(eventFunc.BuildErrorString(err.Error()))
+// 	}
 
-	if !valid {
-		return c.JSON(eventFunc.BuildErrorString("identity could not be verified"))
-	}
+// 	if !valid {
+// 		return c.JSON(eventFunc.BuildErrorString("identity could not be verified"))
+// 	}
 
-	var eventPatcher structs.EventPatcher
-	parseErr := c.BodyParser(&eventPatcher)
+// 	var eventPatcher structs.EventPatcher
+// 	parseErr := c.BodyParser(&eventPatcher)
 
-	if parseErr != nil {
-		return c.JSON(eventFunc.BuildErrorString("malformed request"))
-	}
+// 	if parseErr != nil {
+// 		return c.JSON(eventFunc.BuildErrorString("malformed request"))
+// 	}
 
-	if userClaims.Details.Role != "teacher" {
-		return c.JSON(eventFunc.BuildErrorString("invalid permissions"))
-	}
+// 	if userClaims.Details.Role != "teacher" {
+// 		return c.JSON(eventFunc.BuildErrorString("invalid permissions"))
+// 	}
 
-	patchErr := eventFunc.PatchEvent(c, conn, &eventPatcher)
+// 	patchErr := eventFunc.PatchEvent(c, conn, &eventPatcher)
 
-	if patchErr != nil {
-		return c.JSON(eventFunc.BuildErrorString(patchErr.Error()))
-	}
+// 	if patchErr != nil {
+// 		return c.JSON(eventFunc.BuildErrorString(patchErr.Error()))
+// 	}
 
-	return c.JSON(fiber.Map{
-		"status":  "success",
-		"message": "event was edited",
-	})
-}
+// 	return c.JSON(fiber.Map{
+// 		"status":  "success",
+// 		"message": "event was edited",
+// 	})
+// }
 
 func DeleteEventHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 	var eventFunc functions.EventFunc

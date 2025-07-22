@@ -16,9 +16,9 @@ func SetEventsRouter(app *fiber.App, conn *pgx.Conn) {
 		return handler.PostEventsHandler(c, conn)
 	})
 
-	app.Patch("/v1/events", func(c *fiber.Ctx) error {
-		return handler.PatchEventHandler(c, conn)
-	})
+	// app.Patch("/v1/events", func(c *fiber.Ctx) error {
+	// 	return handler.PatchEventHandler(c, conn)
+	// })
 
 	app.Delete("/v1/events", func(c *fiber.Ctx) error {
 		return handler.DeleteEventHandler(c, conn)
