@@ -84,6 +84,7 @@ Authorization: Bearer <JWT>
 }
 ```
 
+<!--
 <h3>PATCH EndPoint 🪡</h3>
 <p>This endpoint exists to allow clients with the "teacher" role edit events.</p>
 <p>Make a PATCH request to http://localhost:3000/v1/events</p>
@@ -124,7 +125,7 @@ Authorization: Bearer <JWT>
     "status" : "failed",
     "message": <error_description>,
 }
-```
+``` -->
 
 <h3>DELETE EndPoint 🗑️</h3>
 <p>This endpoint exists to allow clients with the "teacher" role delete events.</p>
