@@ -175,11 +175,20 @@ func JWTHandler(c *fiber.Ctx, conn *pgx.Conn) error {
 		return c.JSON(authFunc.BuildErrorMResponse("could not refresh session"))
 	}
 
+	newRefreshToken := authFunc.GenerateRefreshToken()
+
+	sessionErr = authFunc.CreateSession(c, conn, userDetails.Id, base64.StdEncoding.EncodeToString(authFunc.GenerateHash(newRefreshToken)), "")
+	// fmt.Println(sessionErr)
+	if sessionErr != nil {
+		c.Status(500)
+		return c.JSON(authFunc.BuildErrorMResponse("could not create session"))
+	}
+
 	c.Status(200)
 	return c.JSON(fiber.Map{
 		"status":  "success",
 		"message": "session continued",
 		"jwt":     jwtToken,
-		"token":   refreshToken.Token,
+		"token":   newRefreshToken,
 	})
 }
