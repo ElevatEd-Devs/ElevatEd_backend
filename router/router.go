@@ -12,6 +12,7 @@ func SetRouter(conn *pgx.Conn) {
 	SetGresTestRouter(app, conn)
 	SetAuthRouter(app, conn)
 	SetAppointmentRouter(app, conn)
+	SetEventsRouter(app, conn)
 	if err := app.Listen(":3000"); err != nil {
 		log.Fatal(err)
 	}

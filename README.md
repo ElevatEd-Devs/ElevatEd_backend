@@ -7,7 +7,7 @@
 <p>Clone the repository:</p>
 
 ```
-$ git clone https://github.com/ElevatEd-Devs/ElevatEd_backend
+git clone https://github.com/ElevatEd-Devs/ElevatEd_backend
 ```
 
 <p>Make sure to set up the .env file: for more info send a message to the backend channel on discord</p>
@@ -15,13 +15,13 @@ $ git clone https://github.com/ElevatEd-Devs/ElevatEd_backend
 <p>For live reloading make sure your have <a href="https://github.com/air-verse/air">air</a> installed</p>
 
 ```
-$ go install github.com/air-verse/air@latest
+go install github.com/air-verse/air@latest
 ```
 
 <p>Now that your have air installed run the following in the project directory:</p>
 
 ```
-$ air
+air
 ```
 
 <p>This would start the server and listen for changes in the program</p>
@@ -29,16 +29,16 @@ $ air
 <p>You could  also just run the server normally with:</p>
 
 ```
-$ go run main.go
+go run main.go
 ```
 
 <h4>For Ubuntu users</h4>
 <p> You may face some challenges with running air on different terminals, here is a work around: </p>
 
 ```
-$ export PATH=$PATH:$HOME/go/bin
-$ source ~/.bashrc
-$ air
+export PATH=$PATH:$HOME/go/bin
+source ~/.bashrc
+air
 ```
 
 <h2>Using Docker <img width="48" height="48" src="https://img.icons8.com/color/48/docker.png" alt="docker"/></h2>
@@ -47,8 +47,8 @@ $ air
 <p>Note: in this example the host's 3000 port is mapped to the container's 3000 port.</p>
 
 ```
-$ docker build -t elevated_backend .
-$ docker run -p 3000:3000 --rm -v $(pwd):/app -v /app/tmp --name docker-air elevated_backend
+docker build -t elevated_backend .
+docker run -p 3000:3000 --rm -v $(pwd):/app -v /app/tmp --name docker-air elevated_backend
 ```
 
 <h2>Contributing ✍️</h2>
@@ -69,3 +69,4 @@ $ docker run -p 3000:3000 --rm -v $(pwd):/app -v /app/tmp --name docker-air elev
 
 - [Auth Docs](docs/authEndPoints.md)
 - [Appointment Docs](docs/appointmentEndPoints.md)
+- [Event Docs](docs/eventEndPoints.md)
