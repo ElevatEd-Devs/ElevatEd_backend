@@ -70,3 +70,4 @@ docker run -p 3000:3000 --rm -v $(pwd):/app -v /app/tmp --name docker-air elevat
 - [Auth Docs](docs/authEndPoints.md)
 - [Appointment Docs](docs/appointmentEndPoints.md)
 - [Event Docs](docs/eventEndPoints.md)
+- [Grade Docs](gradeEndPoint.md)
