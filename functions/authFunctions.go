@@ -85,7 +85,7 @@ func (*AuthFunc) GenerateHash(password string) []byte {
 func (*AuthFunc) GenerateJWT(c *fiber.Ctx, userDetails structs.UserDetails) (string, error) {
 	var claimStruct CustomClaimStruct
 	claimStruct.Details = userDetails
-	claimStruct.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Hour / 6))
+	claimStruct.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Hour * 3))
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claimStruct)
 
