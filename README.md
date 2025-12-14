@@ -194,7 +194,7 @@ The API is organized into several modules with comprehensive documentation:
 - Grade calculations and statistics
 - Student performance tracking
 
-# Testing
+## 🧪 Testing
 
 ### Testing APIs
 
@@ -205,8 +205,6 @@ The repository includes an `apitest.http` file for quick API testing:
 1. Open `apitest.http` in VS Code with the REST Client extension
 2. Click "Send Request" above any endpoint
 3. View responses directly in the editor
-
-![HTTP Test Example](https://private-user-images.githubusercontent.com/107510378/464916754-c9a77824-75f4-438a-9366-96309653422a.png)
 
 #### Using API Clients
 
@@ -265,8 +263,6 @@ We welcome contributions from the community! Here's how to get started:
    # or
    git checkout -b fix/issue-name
    ```
-
-![Branch Creation](https://private-user-images.githubusercontent.com/107510378/464909681-bb721a49-2d2d-44e2-b26a-d2e10ca01036.png)
 
 3. **Make your changes** following Go best practices
    - Write clean, idiomatic Go code
