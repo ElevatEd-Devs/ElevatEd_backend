@@ -8,15 +8,20 @@ Backend repository for the ElevatEd Education Platform - a comprehensive learnin
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Development](#development)
-- [Docker Setup](#docker-setup)
-- [API Documentation](#api-documentation)
-- [Project Structure](#project-structure)
-- [Testing](#testing)
+- [Overview](#-overview)
+- [Features](#-features)
+- [Tech Stack](#️-tech-stack)
+- [Getting Started](#-getting-started)
+- [Development](#-development)
+- [Docker Setup](#-docker-setup)
+- [API Documentation](#-api-documentation)
+- [Project Structure](#-project-structure)
+- [Testing](#-testing)
+- [Contributing](#-contributing)
+- [Troubleshooting](#-troubleshooting)
+- [Related Repositories](#-related-repositories)
+- [Contributing](#contributing)
+- [Team & Support](#team--support)
 
 ## 🌟 Overview
 
@@ -98,6 +103,8 @@ go version
    ```bash
    go install github.com/air-verse/air@latest
    ```
+
+## 💻 Development
 
 ### Running the Application
 
@@ -194,8 +201,6 @@ The API is organized into several modules with comprehensive documentation:
 - Grade calculations and statistics
 - Student performance tracking
 
-## 🧪 Testing
-
 ### Testing APIs
 
 #### Using HTTP Files
@@ -240,6 +245,8 @@ ElevatEd_backend/
 - **`functions/`** - Reusable business logic and helper functions
 - **`structs/`** - Go structs for request/response models and database entities
 - **`docs/`** - Detailed API documentation for each module
+
+## 🧪 Testing
 
 ### API Testing
 
@@ -301,10 +308,20 @@ We welcome contributions from the community! Here's how to get started:
 - Keep the team updated on Discord
 - Be open to feedback and suggestions
 
+## 👥 Team & Support
+
+### Communication Channels
+
+- **Discord** - Primary communication platform
+  - `#backend` - Backend development discussions
+  - `#general` - General project updates
+  - `#help` - Get assistance from the team
+
 ### Getting Help
 
 1. **Issues** - Report bugs or request features via [GitHub Issues](https://github.com/ElevatEd-Devs/ElevatEd_backend/issues)
-2. **Documentation** - Check the `/docs` folder for detailed guides
+2. **Discord** - Ask questions in the appropriate channels
+3. **Documentation** - Check the `/docs` folder for detailed guides
 
 ### Active Contributors
 
@@ -346,17 +363,30 @@ go clean -modcache
 go mod download
 ```
 
+## 📄 License
+
+This project is part of the ElevatEd platform. Please check with the repository owners for specific license terms.
+
 ## 🔗 Related Repositories
 
-- [ElevatEd Frontend](https://github.com/ElevatEd-Devs/ElevatEd_frontend) - React frontend
+- [ElevatEd Frontend](https://github.com/ElevatEd-Devs/ElevatEd_frontend) - React/Next.js frontend
+
+## 🎯 Roadmap
+
+- [ ] WebSocket support for real-time features
+- [ ] GraphQL API implementation
+- [ ] Advanced analytics and reporting
+- [ ] Integration with third-party LMS platforms
+- [ ] Multi-language support
 
 ## 📊 Project Status
 
 - **Active Development** ✅
 - **Open Issues:** [View Issues](https://github.com/ElevatEd-Devs/ElevatEd_backend/issues)
+- **Latest Release:** Check [Releases](https://github.com/ElevatEd-Devs/ElevatEd_backend/releases)
 
 ---
 
-**Built with by the ElevatEd Development Team**
+**Built by the ElevatEd Development Team**
 
 For more information, visit our [GitHub Organization](https://github.com/ElevatEd-Devs)
