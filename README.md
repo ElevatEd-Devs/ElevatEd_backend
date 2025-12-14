@@ -20,8 +20,6 @@ Backend repository for the ElevatEd Education Platform - a comprehensive learnin
 - [Contributing](#-contributing)
 - [Troubleshooting](#-troubleshooting)
 - [Related Repositories](#-related-repositories)
-- [Contributing](#contributing)
-- [Team & Support](#team--support)
 
 ## 🌟 Overview
 
