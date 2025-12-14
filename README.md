@@ -17,8 +17,6 @@ Backend repository for the ElevatEd Education Platform - a comprehensive learnin
 - [API Documentation](#api-documentation)
 - [Project Structure](#project-structure)
 - [Testing](#testing)
-- [Contributing](#contributing)
-- [Team & Support](#team--support)
 
 ## 🌟 Overview
 
@@ -195,6 +193,8 @@ The API is organized into several modules with comprehensive documentation:
 - Grade submission and retrieval
 - Grade calculations and statistics
 - Student performance tracking
+
+# Testing
 
 ### Testing APIs
 
