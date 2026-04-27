@@ -2,7 +2,7 @@
 
 A production-quality REST API backend for an education platform, built in **Go** with a clean layered architecture, custom-built authentication system, PostgreSQL, Docker, and Tailscale for secure remote access.
 
-> **Stack:** Go · PostgreSQL · Chi Router · Docker · Tailscale · Argon2id · JWT
+> **Stack:** Go · PostgreSQL · Fiber · Docker · Tailscale · Argon2id · JWT
 
 ---
 
